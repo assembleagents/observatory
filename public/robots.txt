@@ -1,0 +1,6 @@
+# Everything here is public and meant to be found, by people and by AI agents.
+User-agent: *
+Allow: /
+Disallow: /webhook
+
+Sitemap: https://assembleagents.dev/sitemap.xml

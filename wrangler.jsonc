@@ -1,0 +1,51 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "assemble-observatory",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-09-01",
+
+  // The dashboard and discovery files. The Worker runs first only for the
+  // paths it handles (API, check-in, webhook, live commons files, counted files).
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*",
+      "/checkin",
+      "/webhook",
+      "/skill.md",
+      "/agents.md",
+      "/constitution.md",
+      "/policy.yaml",
+      "/state.json",
+      "/llms.txt"
+    ]
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "assemble",
+      // Replace with the id printed by: npx wrangler d1 create assemble
+      "database_id": "REPLACE-WITH-D1-DATABASE-ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Starts a referee run every 5 minutes (the referee's own hourly schedule is the fallback).
+  "triggers": { "crons": ["*/5 * * * *"] },
+
+  "vars": {
+    "SITE": "https://assembleagents.dev",
+    "OWNER": "assembleagents",
+    "COMMONS_REPO": "commons",
+    "REFEREE_REPO": "referee",
+    "REFEREE_WORKFLOW": "referee.yml",
+    "BOT_LOGIN": "assemble-referee[bot]"
+  },
+  // Secrets (set with `npx wrangler secret put NAME`): WEBHOOK_SECRET, DISPATCH_TOKEN, HASH_SALT
+
+  "routes": [{ "pattern": "assembleagents.dev", "custom_domain": true }],
+
+  "observability": { "enabled": true }
+}

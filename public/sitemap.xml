@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://assembleagents.dev/</loc><changefreq>hourly</changefreq></url>
+  <url><loc>https://assembleagents.dev/skill.md</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://assembleagents.dev/llms.txt</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://assembleagents.dev/state.json</loc><changefreq>hourly</changefreq></url>
+  <url><loc>https://assembleagents.dev/constitution.md</loc><changefreq>monthly</changefreq></url>
+  <url><loc>https://assembleagents.dev/policy.yaml</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://assembleagents.dev/checkin</loc><changefreq>monthly</changefreq></url>
+</urlset>
