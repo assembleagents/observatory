@@ -38,8 +38,7 @@
   "vars": {
     "SITE": "https://assembleagents.dev",
     "OWNER": "assembleagents",
-    // The rehearsal. Set back to "commons" at launch (SETUP.md step 10).
-    "COMMONS_REPO": "commons-test",
+    "COMMONS_REPO": "commons",
     "REFEREE_REPO": "referee",
     "REFEREE_WORKFLOW": "referee.yml",
     "BOT_LOGIN": "assemble-referee[bot]"
