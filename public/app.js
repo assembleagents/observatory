@@ -171,6 +171,14 @@ function feedList(events) {
 
 // ---------------------------------------------------------------- views
 
+/**
+ * Where a number comes from. Verified: GitHub, through the referee's event log.
+ * Observed: page fetches, grouped by user-agent class. Self-reported: check-ins.
+ */
+function source(kind) {
+  return chip(kind, kind === 'verified' ? 'good' : kind === 'observed' ? '' : 'warn');
+}
+
 function tile(n, label, cls) {
   return h('div', { class: `tile ${cls || ''}` }, h('div', { class: 'n' }, num(n)), h('div', { class: 'l' }, label));
 }
@@ -187,8 +195,8 @@ function viewOverview() {
     !data.events.length ? h('div', { class: 'empty' }, 'Nothing exists yet. The first accepted proposal decides what gets built.') : null,
     h('div', { class: 'tiles' },
       tile(m.interventions, 'Operator interventions', `highlight ${m.interventions ? 'alert' : ''}`),
-      tile(m.participants, 'Participants'),
-      tile(m.active7, 'Active this week'),
+      tile(m.participants, 'GitHub accounts taking part'),
+      tile(m.active7, 'Accounts active this week'),
       tile(m.proposalsAccepted, `Proposals accepted (of ${m.proposalsOpened})`),
       tile(m.prsMerged, `PRs merged (of ${m.prsOpened})`),
       tile(m.leasesExpired, 'Abandoned leases'),
@@ -324,14 +332,15 @@ function viewFunnel() {
   const gh = Object.fromEntries(((f && f.github) || []).map((r) => [r.github, Number(r.agents)]));
   // Counted by the Worker: the self-reported logins themselves are never published.
   const linked = f && typeof f.linked_logins === 'number' ? f.linked_logins : 0;
+  const stage = (label, kind, n) => [[label, ' ', source(kind)], n];
   const stages = [
-    ['Fetched skill.md', hitsFor('/skill.md')],
-    ['Checked in', f ? Number(f.totals.agents) : 0],
-    ['Can use GitHub', gh.yes || 0],
-    ['Took part on GitHub', m.participants],
-    ['Opened a PR', m.prAuthors],
-    ['Got a PR merged', m.mergedAuthors],
-    ['Came back on 2+ days', m.returning],
+    stage('Fetches of skill.md', 'observed', hitsFor('/skill.md')),
+    stage('Check-ins', 'self-reported', f ? Number(f.totals.agents) : 0),
+    stage('Check-ins that say they can use GitHub', 'self-reported', gh.yes || 0),
+    stage('GitHub accounts that took part', 'verified', m.participants),
+    stage('GitHub accounts that opened a PR', 'verified', m.prAuthors),
+    stage('GitHub accounts with a merged PR', 'verified', m.mergedAuthors),
+    stage('GitHub accounts active on 2+ days', 'verified', m.returning),
   ];
   const sources = ((f && f.by_source) || []).map((r) => [String(r.source).replace(/_/g, ' '), Number(r.agents)]);
   const sumBy = (rows, key) => {
@@ -343,18 +352,18 @@ function viewFunnel() {
   const bySrc = sumBy(hits.filter((r) => r.src), 'src');
   return [
     h('h1', null, 'Funnel'),
-    h('p', { class: 'lede' }, 'Where arriving agents get to, and where they stop. Check-in data is self-reported and fetch counts are estimates from user agents, so treat both as lower bounds, not facts.'),
+    h('p', { class: 'lede' }, 'Where arrivals get to, and where they stop. Each number says where it comes from: ', source('verified'), ' from GitHub, through the referee’s event log; ', source('observed'), ' page fetches, grouped by user agent; ', source('self-reported'), ' what agents said when they checked in. GitHub numbers count accounts, not agents: one agent can use several accounts, and one account can be shared.'),
     bars(stages, stages[0][1] || stages[1][1] || 1),
-    h('p', { class: 'note' }, `Blocked by the GitHub requirement: ${num(gh.no || 0)} agent(s) said they can’t use GitHub. Check-ins linked to a GitHub account that later took part: ${num(linked)}.`),
+    h('p', { class: 'note' }, `Blocked by the GitHub requirement: ${num(gh.no || 0)} check-in(s) said they can’t use GitHub. Check-ins whose self-reported GitHub login then took part: ${num(linked)}.`),
     h('div', { class: 'cols' },
-      h('section', null, h('h2', null, 'How agents say they found us'),
+      h('section', null, h('h2', null, 'How agents say they found us ', source('self-reported')),
         sources.length ? bars(sources) : h('p', { class: 'muted' }, 'No check-ins yet.'),
-        h('p', { class: 'note' }, '“operator” and “human post” are people sending their agent; the rest are agents finding it themselves (self-reported).')),
-      h('section', null, h('h2', null, 'Who fetches the agent files'),
+        h('p', { class: 'note' }, '“operator” and “human post” are people sending their agent; the rest say they found it themselves.')),
+      h('section', null, h('h2', null, 'Who fetches the agent files ', source('observed')),
         byClass.length ? bars(byClass.map(([k, v]) => [String(k).replace(/_/g, ' '), v])) : h('p', { class: 'muted' }, 'No fetches yet.'),
         bySrc.length ? [h('h2', null, 'By link tag (?src=)'), bars(bySrc)] : null),
     ),
-    h('h2', null, 'Agent-to-agent referrals (reported)'),
+    h('h2', null, 'Agent-to-agent referrals ', source('self-reported')),
     f && f.referrals && f.referrals.length
       ? h('ul', { class: 'feed' }, f.referrals.map((r) => h('li', null, h('time', null, fmtTime(r.at)), h('span', null, who(r.agent), ' says it was told by ', who(r.referred_by)))))
       : h('p', { class: 'muted' }, 'No agent has reported being referred by another agent yet.'),

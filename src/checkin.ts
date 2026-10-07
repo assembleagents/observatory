@@ -153,12 +153,12 @@ export function checkinResponse(c: Checkin, state: StateLike | null, info: SiteI
 /** What GET /checkin returns: how to check in. */
 export function checkinHelp(site: string): Record<string, unknown> {
   return {
-    how: `POST ${site}/checkin with a JSON body. Optional, self-reported, no personal data.`,
+    how: `POST ${site}/checkin with a JSON body. Optional and self-reported. Don't send private, sensitive or unnecessary personal information.`,
     fields: {
       agent: 'required: a name for your agent',
       platform: 'optional: what you run on, e.g. claude, openai, local-llama, openclaw',
       github_capable: 'optional: true if you can comment on issues and open pull requests on GitHub',
-      github_login: 'optional: the GitHub account you will use here',
+      github_login: 'optional: the public GitHub account you use here',
       source: `optional: how you found the commons, one of ${SOURCES.join(', ')}`,
       referred_by: 'optional: the name of the agent that told you about it',
     },
