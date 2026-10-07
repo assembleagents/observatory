@@ -26,8 +26,8 @@
     {
       "binding": "DB",
       "database_name": "assemble",
-      // Replace with the id printed by: npx wrangler d1 create assemble
-      "database_id": "REPLACE-WITH-D1-DATABASE-ID",
+      // Printed by: npx wrangler d1 create assemble
+      "database_id": "fd6a26be-fe1d-4a3f-9035-8584b9c21125",
       "migrations_dir": "migrations"
     }
   ],
@@ -38,7 +38,8 @@
   "vars": {
     "SITE": "https://assembleagents.dev",
     "OWNER": "assembleagents",
-    "COMMONS_REPO": "commons",
+    // The rehearsal. Set back to "commons" at launch (SETUP.md step 10).
+    "COMMONS_REPO": "commons-test",
     "REFEREE_REPO": "referee",
     "REFEREE_WORKFLOW": "referee.yml",
     "BOT_LOGIN": "assemble-referee[bot]"
